@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GVision - Cadastro Google Empresas</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --navy: #0f2744; --green: #3aa54f; --white: #fff; --gray: #f8f9fa; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--gray); color: var(--navy); }
+        header { background: linear-gradient(135deg, var(--navy), #1a3a52); color: var(--white); padding: 1.5rem; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,.1); }
+        .header { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 1.5rem; }
+        .logo-container { width: 70px; height: 70px; border-radius: 50%; background: var(--white); display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+        .logo-container img { width: 100%; height: 100%; border-radius: 50%; object-fit: contain; padding: 4px; }
+        .brand h1 { font-size: 2rem; margin: 0; font-weight: 700; letter-spacing: -0.5px; }
+        .brand p { font-size: 0.9rem; color: #4db85f; margin: 4px 0 0 0; font-weight: 500; letter-spacing: 0.5px; }
+        .hero { background: linear-gradient(135deg, var(--navy), #1a3a52); color: var(--white); padding: 4rem 2rem; text-align: center; }
+        .hero-content { max-width: 800px; margin: 0 auto; }
+        .hero h2 { font-size: 2.5rem; margin-bottom: 1rem; font-weight: 700; }
+        .hero p { font-size: 1.1rem; opacity: 0.95; margin-bottom: 1.5rem; line-height: 1.8; }
+        .benefits { max-width: 1200px; margin: -3rem auto 3rem; padding: 0 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; position: relative; z-index: 10; }
+        .card { background: var(--white); padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(15,39,68,.08); border-left: 4px solid var(--green); transition: all 0.3s ease; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(15,39,68,.12); }
+        .icon { font-size: 2.5rem; margin-bottom: 1rem; }
+        .card h3 { color: var(--navy); margin-bottom: 0.5rem; font-size: 1.1rem; }
+        .card p { color: #6c757d; font-size: 0.95rem; }
+        .form-section { max-width: 900px; margin: 3rem auto; padding: 0 2rem; }
+        .form-header { text-align: center; margin-bottom: 2.5rem; }
+        .form-header h2 { font-size: 2rem; color: var(--navy); margin-bottom: 0.5rem; }
+        .form-header p { color: #6c757d; font-size: 1rem; }
+        .progress-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 0.5rem; }
+        .progress-step { display: flex; flex-direction: column; align-items: center; cursor: pointer; flex: 1; min-width: 70px; }
+        .step-circle { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1rem; margin-bottom: 0.5rem; background: #e9ecef; color: #6c757d; transition: all 0.3s ease; border: 2px solid transparent; }
+        .progress-step.active .step-circle { background: linear-gradient(135deg, var(--green), #4db85f); color: var(--white); border-color: var(--green); box-shadow: 0 4px 12px rgba(58,165,79,.3); }
+        .progress-step.completed .step-circle { background: var(--green); color: var(--white); border-color: var(--green); }
+        .step-label { font-size: 0.75rem; color: #6c757d; text-align: center; font-weight: 500; margin-top: 0.25rem; }
+        .progress-step.active .step-label, .progress-step.completed .step-label { color: var(--green); }
+        .form-content { background: var(--white); padding: 2.5rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(15,39,68,.08); }
+        .form-step { display: none; }
+        .form-step.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .form-step h3 { color: var(--navy); margin-bottom: 1.5rem; font-size: 1.3rem; padding-bottom: 1rem; border-bottom: 2px solid #e9ecef; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
+        label { display: block; margin-bottom: 0.5rem; color: var(--navy); font-weight: 600; font-size: 0.95rem; }
+        input[type="text"], input[type="email"], input[type="tel"], input[type="time"], select, textarea { width: 100%; padding: 0.75rem 1rem; border: 1.5px solid #e9ecef; border-radius: 8px; font-size: 0.95rem; font-family: inherit; transition: all 0.3s ease; background: var(--white); color: var(--navy); }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(58,165,79,.1); }
+        input::placeholder { color: #6c757d; }
+        textarea { resize: vertical; min-height: 100px; }
+        .checkbox-group { display: flex; flex-direction: column; gap: 1rem; }
+        .checkbox-item { display: flex; align-items: center; gap: 0.75rem; cursor: pointer; }
+        input[type="checkbox"], input[type="radio"] { width: 20px; height: 20px; cursor: pointer; accent-color: var(--green); }
+        .checkbox-label { margin: 0; font-weight: 500; cursor: pointer; }
+        .time-group { display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem; align-items: flex-end; }
+        .time-separator { color: #6c757d; font-weight: 600; padding-bottom: 0.75rem; }
+        .form-buttons { display: flex; gap: 1rem; margin-top: 2rem; justify-content: space-between; }
+        button { padding: 0.9rem 1.8rem; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; letter-spacing: 0.3px; }
+        .btn-secondary { background: #e9ecef; color: var(--navy); }
+        .btn-secondary:hover:not(:disabled) { background: #6c757d; color: var(--white); }
+        .btn-primary { background: linear-gradient(135deg, var(--green), #4db85f); color: var(--white); flex: 1; }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(58,165,79,.3); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .success-message { display: none; background: linear-gradient(135deg, var(--green), #4db85f); color: var(--white); padding: 2rem; border-radius: 12px; text-align: center; margin-top: 2rem; box-shadow: 0 4px 15px rgba(58,165,79,.2); }
+        .success-message.show { display: block; animation: slideUp 0.5s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .success-message h3 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .success-message p { font-size: 1rem; opacity: 0.95; }
+        footer { background: linear-gradient(135deg, var(--navy), #1a3a52); color: var(--white); padding: 2rem; text-align: center; margin-top: 4rem; }
+        footer p { margin: 0; font-size: 0.9rem; opacity: 0.9; }
+        @media (max-width: 768px) {
+            .header { flex-direction: column; text-align: center; gap: 1rem; }
+            .brand h1 { font-size: 1.5rem; }
+            .hero h2 { font-size: 1.8rem; }
+            .form-content { padding: 1.5rem; }
+            .form-buttons { flex-direction: column-reverse; }
+            button { width: 100%; }
+            .progress-container { gap: 0; }
+            .progress-step { min-width: 50px; }
+            .step-circle { width: 38px; height: 38px; font-size: 0.9rem; }
+            .step-label { font-size: 0.65rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header">
+            <div class="logo-container">
+                <img src="logo.png" alt="GVision Logo" onerror="this.style.display='none'">
+            </div>
+            <div class="brand">
+                <h1>GVision</h1>
+                <p>Marketing Digital</p>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Cresça sua Presença Online</h2>
+            <p>Cadastre seu negócio no Google Empresas e aumente sua visibilidade entre clientes em busca de seus serviços</p>
+        </div>
+    </section>
+
+    <section class="benefits">
+        <div class="card">
+            <div class="icon">📍</div>
+            <h3>Mais Visibilidade</h3>
+            <p>Apareça nos resultados de busca do Google Maps e Pesquisa</p>
+        </div>
+        <div class="card">
+            <div class="icon">⭐</div>
+            <h3>Avaliações</h3>
+            <p>Receba avaliações autênticas de seus clientes</p>
+        </div>
+        <div class="card">
+            <div class="icon">📞</div>
+            <h3>Contato Direto</h3>
+            <p>Clientes podem ligar, enviar mensagem ou visitar seu site</p>
+        </div>
+    </section>
+
+    <section class="form-section">
+        <div class="form-header">
+            <h2>Cadastre Seu Negócio</h2>
+            <p>Preencha as informações abaixo para configurar seu perfil no Google Empresas</p>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-step active" data-step="1">
+                <div class="step-circle">1</div>
+                <div class="step-label">Básico</div>
+            </div>
+            <div class="progress-step" data-step="2">
+                <div class="step-circle">2</div>
+                <div class="step-label">Contato</div>
+            </div>
+            <div class="progress-step" data-step="3">
+                <div class="step-circle">3</div>
+                <div class="step-label">Endereço</div>
+            </div>
+            <div class="progress-step" data-step="4">
+                <div class="step-circle">4</div>
+                <div class="step-label">Horários</div>
+            </div>
+            <div class="progress-step" data-step="5">
+                <div class="step-circle">5</div>
+                <div class="step-label">Serviços</div>
+            </div>
+            <div class="progress-step" data-step="6">
+                <div class="step-circle">6</div>
+                <div class="step-label">Legal</div>
+            </div>
+        </div>
+
+        <form id="googleBusinessForm" class="form-content">
+            <!-- SEÇÃO 1: BÁSICO -->
+            <div class="form-step active" data-step="1">
+                <h3>1. Informações Básicas</h3>
+                <div class="form-group">
+                    <label for="nomeNegocio">Nome do Negócio *</label>
+                    <input type="text" id="nomeNegocio" name="nomeNegocio" placeholder="Ex: Restaurante Casa da Nonna" required>
+                </div>
+                <div class="form-group">
+                    <label for="categoria">Categoria do Negócio *</label>
+                    <select id="categoria" name="categoria" required>
+                        <option value="">Selecione uma categoria</option>
+                        <option value="Restaurante">🍽️ Restaurante</option>
+                        <option value="Salão de Beleza">💇 Salão de Beleza</option>
+                        <option value="Consultório">⚕️ Consultório</option>
+                        <option value="Loja de Varejo">🛍️ Loja de Varejo</option>
+                        <option value="Consultoria">💼 Consultoria</option>
+                        <option value="Hotel">🏨 Hotel</option>
+                        <option value="Academia">💪 Academia</option>
+                        <option value="Outro">📋 Outro</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="descricao">Descrição do Negócio</label>
+                    <textarea id="descricao" name="descricao" placeholder="Descreva brevemente seu negócio, produtos/serviços principais..."></textarea>
+                </div>
+            </div>
+
+            <!-- SEÇÃO 2: CONTATO -->
+            <div class="form-step" data-step="2">
+                <h3>2. Informações de Contato</h3>
+                <div class="form-group">
+                    <label for="telefone">Telefone Principal *</label>
+                    <input type="tel" id="telefone" name="telefone" placeholder="(11) 98765-4321" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Comercial *</label>
+                    <input type="email" id="email" name="email" placeholder="contato@seunegocio.com.br" required>
+                </div>
+                <div class="form-group">
+                    <label for="website">Website (se houver)</label>
+                    <input type="text" id="website" name="website" placeholder="https://www.seunegocio.com.br">
+                </div>
+            </div>
+
+            <!-- SEÇÃO 3: ENDEREÇO -->
+            <div class="form-step" data-step="3">
+                <h3>3. Endereço Comercial</h3>
+                <div class="form-group">
+                    <label for="rua">Rua/Avenida *</label>
+                    <input type="text" id="rua" name="rua" placeholder="Avenida Paulista" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="numero">Número *</label>
+                        <input type="text" id="numero" name="numero" placeholder="1000" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="complemento">Complemento</label>
+                        <input type="text" id="complemento" name="complemento" placeholder="Apto, sala, etc">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="bairro">Bairro *</label>
+                    <input type="text" id="bairro" name="bairro" placeholder="Bela Vista" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cidade">Cidade *</label>
+                        <input type="text" id="cidade" name="cidade" placeholder="São Paulo" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="estado">Estado *</label>
+                        <select id="estado" name="estado" required>
+                            <option value="">Selecione</option>
+                            <option value="SP">SP</option>
+                            <option value="RJ">RJ</option>
+                            <option value="MG">MG</option>
+                            <option value="BA">BA</option>
+                            <option value="RS">RS</option>
+                            <option value="PR">PR</option>
+                            <option value="SC">SC</option>
+                            <option value="PE">PE</option>
+                            <option value="GO">GO</option>
+                            <option value="DF">DF</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="cep">CEP *</label>
+                        <input type="text" id="cep" name="cep" placeholder="01311-100" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO 4: HORÁRIOS -->
+            <div class="form-step" data-step="4">
+                <h3>4. Horário de Funcionamento</h3>
+                <div class="form-group">
+                    <label><input type="checkbox" id="aberto24h" name="aberto24h"> Aberto 24 horas</label>
+                </div>
+                <div id="horarioDetalhado">
+                    <div class="form-group">
+                        <label>Segunda-feira</label>
+                        <div class="time-group">
+                            <input type="time" id="seg_inicio" name="seg_inicio">
+                            <span class="time-separator">até</span>
+                            <input type="time" id="seg_fim" name="seg_fim">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Terça-feira</label>
+                        <div class="time-group">
+                            <input type="time" id="ter_inicio" name="ter_inicio">
+                            <span class="time-separator">até</span>
+                            <input type="time" id="ter_fim" name="ter_fim">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Quarta-feira</label>
+                        <div class="time-group">
+                            <input type="time" id="qua_inicio" name="qua_inicio">
+                            <span class="time-separator">até</span>
+                            <input type="time" id="qua_fim" name="qua_fim">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Quinta-feira</label>
+                        <div class="time-group">
+                            <input type="time" id="qui_inicio" name="qui_inicio">
+                            <span class="time-separator">até</span>
+                            <input type="time" id="qui_fim" name="qui_fim">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Sexta-feira</label>
+                        <div class="time-group">
+                            <input type="time" id="sex_inicio" name="sex_inicio">
+                            <span class="time-separator">até</span>
+                            <input type="time" id="sex_fim" name="sex_fim">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Sábado</label>
+                        <div class="time-group">
+                            <input type="time" id="sab_inicio" name="sab_inicio">
+                            <span class="time-separator">até</span>
+                            <input type="time" id="sab_fim" name="sab_fim">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Domingo</label>
+                        <div class="time-group">
+                            <input type="time" id="dom_inicio" name="dom_inicio">
+                            <span class="time-separator">até</span>
+                            <input type="time" id="dom_fim" name="dom_fim">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO 5: SERVIÇOS -->
+            <div class="form-step" data-step="5">
+                <h3>5. Serviços Oferecidos</h3>
+                <div class="form-group">
+                    <label>Selecione os serviços disponíveis:</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="pagamento" name="servico_pagamento" value="Pagamento Online">
+                            <label for="pagamento" class="checkbox-label">💳 Aceita Pagamento Online</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="entrega" name="servico_entrega" value="Entrega em Domicílio">
+                            <label for="entrega" class="checkbox-label">🚚 Entrega em Domicílio</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="retirada" name="servico_retirada" value="Retirada Local">
+                            <label for="retirada" class="checkbox-label">📦 Retirada Local</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="wifi" name="servico_wifi" value="WiFi Gratuito">
+                            <label for="wifi" class="checkbox-label">📡 WiFi Gratuito</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="estacionamento" name="servico_estacionamento" value="Estacionamento">
+                            <label for="estacionamento" class="checkbox-label">🅿️ Estacionamento</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="acessibilidade" name="servico_acessibilidade" value="Acessibilidade">
+                            <label for="acessibilidade" class="checkbox-label">♿ Acessibilidade</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO 6: LEGAL -->
+            <div class="form-step" data-step="6">
+                <h3>6. Dados Legais</h3>
+                <div class="form-group">
+                    <label for="cnpj">CNPJ *</label>
+                    <input type="text" id="cnpj" name="cnpj" placeholder="12.345.678/0001-90" required>
+                </div>
+                <div class="form-group">
+                    <label for="responsavel">Nome Responsável *</label>
+                    <input type="text" id="responsavel" name="responsavel" placeholder="João Silva" required>
+                </div>
+                <div class="form-group">
+                    <label for="telefonePessoal">Telefone Responsável</label>
+                    <input type="tel" id="telefonePessoal" name="telefonePessoal" placeholder="(11) 99999-8888">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="termos" name="termos" required>
+                        <span class="checkbox-label">Aceito os termos e condições *</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-buttons">
+                <button type="button" id="btnAnterior" class="btn-secondary" style="display: none;">← Anterior</button>
+                <button type="button" id="btnProximo" class="btn-primary">Próximo →</button>
+            </div>
+
+            <div class="success-message" id="successMessage">
+                <h3>✅ Cadastro Realizado com Sucesso!</h3>
+                <p>Seus dados foram enviados e em breve você receberá um contato de nosso time.</p>
+            </div>
+        </form>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 GVision - Marketing Digital. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        const form = document.getElementById('googleBusinessForm');
+        const btnProximo = document.getElementById('btnProximo');
+        const btnAnterior = document.getElementById('btnAnterior');
+        const aberto24h = document.getElementById('aberto24h');
+        const horarioDetalhado = document.getElementById('horarioDetalhado');
+        const successMessage = document.getElementById('successMessage');
+
+        let currentStep = 1;
+        const totalSteps = 6;
+
+        aberto24h.addEventListener('change', function() {
+            horarioDetalhado.style.display = this.checked ? 'none' : 'block';
+        });
+
+        document.querySelectorAll('.progress-step').forEach(step => {
+            step.addEventListener('click', function() {
+                const stepNum = parseInt(this.dataset.step);
+                if (isStepValid(currentStep)) {
+                    goToStep(stepNum);
+                }
+            });
+        });
+
+        btnProximo.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (isStepValid(currentStep)) {
+                if (currentStep < totalSteps) {
+                    goToStep(currentStep + 1);
+                } else {
+                    submitForm();
+                }
+            }
+        });
+
+        btnAnterior.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (currentStep > 1) {
+                goToStep(currentStep - 1);
+            }
+        });
+
+        function goToStep(step) {
+            document.querySelectorAll('.form-step').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.querySelector(`.form-step[data-step="${step}"]`).classList.add('active');
+
+            updateProgress(step);
+            currentStep = step;
+            updateButtons();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateProgress(step) {
+            document.querySelectorAll('.progress-step').forEach((el, index) => {
+                const stepNum = index + 1;
+                el.classList.remove('active', 'completed');
+                if (stepNum === step) {
+                    el.classList.add('active');
+                } else if (stepNum < step) {
+                    el.classList.add('completed');
+                }
+            });
+        }
+
+        function updateButtons() {
+            btnAnterior.style.display = currentStep > 1 ? 'block' : 'none';
+            btnProximo.textContent = currentStep === totalSteps ? '✓ Enviar' : 'Próximo →';
+        }
+
+        function isStepValid(step) {
+            const requiredFields = document.querySelectorAll(`.form-step[data-step="${step}"] input[required], .form-step[data-step="${step}"] select[required]`);
+            let isValid = true;
+
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.style.borderColor = '#dc3545';
+                    isValid = false;
+                } else {
+                    field.style.borderColor = '';
+                }
+            });
+
+            return isValid;
+        }
+
+        async function submitForm() {
+            if (!isStepValid(currentStep)) {
+                alert('Por favor, preencha todos os campos obrigatórios.');
+                return;
+            }
+
+            try {
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData);
+
+                // 🔴 IMPORTANTE: Substitua pela URL do seu Google Apps Script
+                const APPS_SCRIPT_URL = 'https://script.google.com/macros/d/[SUA_ID_AQUI]/usercopy';
+
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    form.reset();
+                    successMessage.classList.add('show');
+                    document.querySelectorAll('.form-step').forEach(el => {
+                        el.classList.remove('active');
+                    });
+                    goToStep(1);
+                } else {
+                    throw new Error('Erro na resposta do servidor');
+                }
+            } catch (error) {
+                console.error('Erro ao enviar formulário:', error);
+                alert('Erro ao enviar os dados. Por favor, tente novamente ou verifique se a URL do Google Apps Script está correta.');
+            }
+        }
+
+        document.querySelectorAll('input[required], select[required]').forEach(field => {
+            field.addEventListener('change', function() {
+                if (this.value.trim()) {
+                    this.style.borderColor = '';
+                }
+            });
+        });
+
+        updateButtons();
+    </script>
+</body>
+</html>
